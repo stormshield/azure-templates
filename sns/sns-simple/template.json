@@ -1,0 +1,330 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    	"SNSAdminPassword": {
+            "defaultValue": null,
+            "type": "SecureString",
+            "metadata": { "description": "Administration password of the SNS" }
+        },
+    	"VnetName": {
+            "defaultValue": "virtual-network",
+            "type": "String",
+            "metadata": { "description": "Name of the virtual network" }
+        },
+        "VnetPrefix": {
+        	"type": "string",
+        	"defaultValue": "192.168.0.0/16",
+        	"metadata": { "description": "Virtual network address CIDR" }
+        },
+        "PublicSubnetName": {
+        	"type": "string",
+        	"defaultValue": "Public",
+        	"metadata": { "description": "Public subnet name" }
+        },
+        "PublicSubnetPrefix": {
+        	"type": "string",
+        	"defaultValue": "192.168.0.0/24",
+        	"metadata": { "description": "Public subnet CIDR" }
+        },
+        "PrivateSubnetName": {
+        	"type": "string",
+        	"defaultValue": "Private",
+        	"metadata": { "description": "Private subnet name" }
+        },
+        "PrivateSubnetPrefix": {
+        	"type": "string",
+        	"defaultValue": "192.168.1.0/24",
+        	"metadata": { "description": "Private subnet CIDR" }
+        },
+        "SNSName": {
+            "defaultValue": "sns-gateway",
+            "type": "String",
+            "metadata": { "description": "Name of the SNS virtual machine" }
+        },
+        "SNSIfName": {
+            "defaultValue": "sns-gateway-nic",
+            "type": "String",
+            "metadata": { "description": "Name of the SNS VM network interface" }
+        },
+        "SNSIfIP": {
+            "defaultValue": "192.168.0.100",
+            "type": "String",
+            "metadata": { "description": "IP address of the SNS VM" }
+        },
+        "VmSize": {
+            "defaultValue": "Standard_A1",
+            "type": "String",
+            "metadata": { "description": "Azure VM Size" }
+        },
+        "SGName": {
+            "defaultValue": "security-group",
+            "type": "String",
+            "metadata": { "description": "Name of the security group" }
+        },
+        "PublicIpName": {
+            "defaultValue": "sns-gateway-public-ip",
+            "type": "String",
+            "metadata": { "description": "Name of the Public IP" }
+        },
+        "RouteTableName": {
+            "defaultValue": "route-table-private",
+            "type": "String",
+            "metadata": { "description": "Name of the Private subnet route table" }
+        },
+        "StorageAccountName": {
+            "defaultValue": "[concat('snssimple', uniqueString(resourceGroup().id))]",
+            "type": "String",
+            "metadata": { "description": "Name of the storage account" }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "SNS VM",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('SNSName')]",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "plan": {
+                "name": "byol-single-instance",
+                "product": "stormshield-network-security-for-cloud",
+                "publisher": "stormshield"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('VmSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "stormshield",
+                        "offer": "stormshield-network-security-for-cloud",
+                        "sku": "byol-single-instance",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[parameters('SNSName')]",
+                        "createOption": "FromImage",
+                        "vhd": {
+                            "uri": "[concat('http', '://', parameters('StorageAccountName'), '.blob.core.windows.net', concat('/vhds/', parameters('SNSName'),'.vhd'))]"
+                        },
+                        "caching": "ReadWrite"
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[parameters('SNSName')]",
+                    "adminUsername": "not_important",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": false
+                    },
+                    "secrets": [],
+                    "adminPassword": "[parameters('SNSAdminPassword')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfName'))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [],
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfName'))]"
+            ]
+        },
+        {
+            "comments": "SNS VM nic",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[parameters('SNSIfName')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAddress": "[parameters('SNSIfIP')]",
+                            "privateIPAllocationMethod": "Static",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('PublicIpName'))]"
+                            },
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName')), '/subnets/public')]"
+                            }
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableIPForwarding": true,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('SGName'))]"
+                }
+            },
+            "resources": [],
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('PublicIpName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('SGName'))]"
+            ]
+        },
+        {
+            "comments": "Security group",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[parameters('SGName')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ssh",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "https",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1200,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "http",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1300,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "AllowAll",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Outbound"
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "dependsOn": []
+        },
+        {
+            "comments": "SNS VM public IP",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[parameters('PublicIpName')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4
+            },
+            "resources": [],
+            "dependsOn": []
+        },
+        {
+            "comments": "Route table for the DMZ",
+            "type": "Microsoft.Network/routeTables",
+            "name": "[parameters('RouteTableName')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "routes": [
+                    {
+                        "name": "toInternet",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[parameters('SNSIfIP')]"
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "dependsOn": []
+        },
+        {
+            "comments": "VNET",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('VnetName')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('VnetPrefix')]"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": []
+                },
+                "subnets": [
+                    {
+                        "name": "public",
+                        "properties": {
+                            "addressPrefix": "[parameters('PublicSubnetPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "dmz",
+                        "properties": {
+                            "addressPrefix": "[parameters('PrivateSubnetPrefix')]",
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables', parameters('RouteTableName'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/routeTables', parameters('RouteTableName'))]"
+            ]
+        },
+        {
+            "comments": "Storage account",
+            "type": "Microsoft.Storage/storageAccounts",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage",
+            "name": "[parameters('StorageAccountName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {},
+            "resources": [],
+            "dependsOn": []
+        }
+    ]
+}
