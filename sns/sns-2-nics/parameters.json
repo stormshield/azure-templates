@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    	"SNSAdminPassword": {
+            "value": "ChangeMe!953"
+        },
+    	"VnetName": {
+            "value": "virtual-network"
+        },
+        "VnetPrefix": {
+        	"value": "192.168.0.0/16"
+        },
+        "PublicSubnetName": {
+        	"value": "Public"
+        },
+        "PublicSubnetPrefix": {
+        	"value": "192.168.0.0/24"
+        },
+        "PrivateSubnetName": {
+        	"value": "Private"
+        },
+        "PrivateSubnetPrefix": {
+        	"value": "192.168.1.0/24"
+        },
+        "SNSName": {
+            "value": "sns-gateway"
+        },
+        "SNSIfPublicName": {
+            "value": "sns-gateway-public-nic"
+        },
+        "SNSIfPublicIP": {
+            "value": "192.168.0.100"
+        },
+        "SNSIfPrivateName": {
+            "value": "sns-gateway-private-nic"
+        },
+        "SNSIfPrivateIP": {
+            "value": "192.168.1.100"
+        },
+        "VmSize": {
+            "value": "Standard_A3"
+        },
+        "SGName": {
+            "value": "security-group"
+        },
+        "PublicIpName": {
+            "value": "sns-gateway-public-ip"
+        },
+        "RouteTableName": {
+            "value": "route-table-private"
+        },
+        "StorageAccountName": {
+            "value": "storageAeiuGGFD789dfd89"
+        }
+    }
+}

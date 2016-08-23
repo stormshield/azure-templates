@@ -42,25 +42,30 @@
             "type": "String",
             "metadata": { "description": "Name of the SNS virtual machine" }
         },
-        "SNSIfName": {
-            "defaultValue": "sns-gateway-nic",
+        "SNSIfPublicName": {
+            "defaultValue": "sns-gateway-public-nic",
             "type": "String",
-            "metadata": { "description": "Name of the SNS VM network interface" }
+            "metadata": { "description": "Name of the SNS VM public interface" }
         },
-        "SNSIfIP": {
+        "SNSIfPublicIP": {
             "defaultValue": "192.168.0.100",
             "type": "String",
-            "metadata": { "description": "IP address of the SNS VM" }
+            "metadata": { "description": "IP address of the SNS VM public interface" }
+        },
+        "SNSIfPrivateName": {
+            "defaultValue": "sns-gateway-private-nic",
+            "type": "String",
+            "metadata": { "description": "Name of the SNS VM private interface" }
+        },
+        "SNSIfPrivateIP": {
+            "defaultValue": "192.168.1.100",
+            "type": "String",
+            "metadata": { "description": "IP address of the SNS VM private interface" }
         },
         "VmSize": {
-            "defaultValue": "Standard_A1",
+            "defaultValue": "Standard_A3",
             "type": "String",
             "metadata": { "description": "Azure VM Size" }
-        },
-        "SGName": {
-            "defaultValue": "security-group",
-            "type": "String",
-            "metadata": { "description": "Name of the security group" }
         },
         "PublicIpName": {
             "defaultValue": "sns-gateway-public-ip",
@@ -124,7 +129,16 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfName'))]"
+                        	"properties": {
+                                "primary": true
+                            },
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfPublicName'))]"
+                        },
+                        {
+                        	"properties": {
+                                "primary": false
+                            },
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfPrivateName'))]"
                         }
                     ]
                 }
@@ -132,13 +146,14 @@
             "resources": [],
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]",
-                "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfName'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfPublicName'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfPrivateName'))]"
             ]
         },
         {
-            "comments": "SNS VM nic",
+            "comments": "SNS VM Public nic",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[parameters('SNSIfName')]",
+            "name": "[parameters('SNSIfPublicName')]",
             "apiVersion": "2016-03-30",
             "location": "[resourceGroup().location]",
             "properties": {
@@ -146,7 +161,7 @@
                     {
                         "name": "ipconfig1",
                         "properties": {
-                            "privateIPAddress": "[parameters('SNSIfIP')]",
+                            "privateIPAddress": "[parameters('SNSIfPublicIP')]",
                             "privateIPAllocationMethod": "Static",
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('PublicIpName'))]"
@@ -160,83 +175,42 @@
                 "dnsSettings": {
                     "dnsServers": []
                 },
-                "enableIPForwarding": true,
-                "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('SGName'))]"
-                }
+                "enableIPForwarding": true
             },
             "resources": [],
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('PublicIpName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('SGName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName'))]"
             ]
         },
         {
-            "comments": "Security group",
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[parameters('SGName')]",
+            "comments": "SNS VM Private nic",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[parameters('SNSIfPrivateName')]",
             "apiVersion": "2016-03-30",
             "location": "[resourceGroup().location]",
-            "tags": {},
             "properties": {
-                "securityRules": [
+                "ipConfigurations": [
                     {
-                        "name": "ssh",
+                        "name": "ipconfig1",
                         "properties": {
-                            "protocol": "TCP",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "22",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 1100,
-                            "direction": "Inbound"
-                        }
-                    },
-                    {
-                        "name": "https",
-                        "properties": {
-                            "protocol": "TCP",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "443",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 1200,
-                            "direction": "Inbound"
-                        }
-                    },
-                    {
-                        "name": "http",
-                        "properties": {
-                            "protocol": "Tcp",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "80",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 1300,
-                            "direction": "Inbound"
-                        }
-                    },
-                    {
-                        "name": "AllowAll",
-                        "properties": {
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "*",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 100,
-                            "direction": "Outbound"
+                            "privateIPAddress": "[parameters('SNSIfPrivateIP')]",
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName')), '/subnets/private')]"
+                            }
                         }
                     }
-                ]
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableIPForwarding": true
             },
             "resources": [],
-            "dependsOn": []
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName'))]"
+            ]
         },
         {
             "comments": "SNS VM public IP",
@@ -252,7 +226,7 @@
             "dependsOn": []
         },
         {
-            "comments": "Route table for the Private subnet",
+            "comments": "Route table for the Private network",
             "type": "Microsoft.Network/routeTables",
             "name": "[parameters('RouteTableName')]",
             "apiVersion": "2016-03-30",
@@ -264,7 +238,7 @@
                         "properties": {
                             "addressPrefix": "0.0.0.0/0",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[parameters('SNSIfIP')]"
+                            "nextHopIpAddress": "[parameters('SNSIfPrivateIP')]"
                         }
                     }
                 ]
