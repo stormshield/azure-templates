@@ -71,14 +71,11 @@
             "defaultValue": "route-table-private",
             "type": "String",
             "metadata": { "description": "Name of the Private subnet route table" }
-        },
-        "StorageAccountName": {
-            "defaultValue": "[concat('snssimple', uniqueString(resourceGroup().id))]",
-            "type": "String",
-            "metadata": { "description": "Name of the storage account" }
         }
     },
-    "variables": {},
+    "variables": {
+            "StorageAccountName": "[concat(uniqueString(resourceGroup().id),'storage')]"
+    },
     "resources": [
         {
             "comments": "SNS VM",
@@ -106,7 +103,7 @@
                         "name": "[parameters('SNSName')]",
                         "createOption": "FromImage",
                         "vhd": {
-                            "uri": "[concat('http', '://', parameters('StorageAccountName'), '.blob.core.windows.net', concat('/vhds/', parameters('SNSName'),'.vhd'))]"
+                            "uri": "[concat('http', '://', variables('StorageAccountName'), '.blob.core.windows.net', concat('/vhds/', parameters('SNSName'),'.vhd'))]"
                         },
                         "caching": "ReadWrite"
                     },
@@ -131,7 +128,7 @@
             },
             "resources": [],
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName'))]",
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfName'))]"
             ]
         },
@@ -318,7 +315,7 @@
                 "tier": "Standard"
             },
             "kind": "Storage",
-            "name": "[parameters('StorageAccountName')]",
+            "name": "[variables('StorageAccountName')]",
             "apiVersion": "2016-01-01",
             "location": "[resourceGroup().location]",
             "tags": {},

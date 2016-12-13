@@ -43,9 +43,6 @@
         },
         "RouteTableName": {
             "value": "route-table-private"
-        },
-        "StorageAccountName": {
-            "value": "storageAeiuh8789dfd89"
         }
     }
 }
