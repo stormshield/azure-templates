@@ -63,7 +63,7 @@
             "metadata": { "description": "IP address of the SNS VM private interface" }
         },
         "VmSize": {
-            "defaultValue": "Standard_A3",
+            "defaultValue": "Standard_D2s_v3",
             "type": "String",
             "metadata": { "description": "Azure VM Size" }
         },
