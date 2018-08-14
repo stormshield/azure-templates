@@ -41,9 +41,6 @@
         "VmSize": {
             "value": "Standard_A3"
         },
-        "SGName": {
-            "value": "security-group"
-        },
         "PublicIpName": {
             "value": "sns-gateway-public-ip"
         },

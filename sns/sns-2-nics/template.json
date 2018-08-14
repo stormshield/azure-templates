@@ -78,15 +78,12 @@
             "metadata": { "description": "Name of the Private subnet route table" }
         }
     },
-    "variables": {
-            "StorageAccountName": "[concat(uniqueString(resourceGroup().id),'storage')]"
-    },
     "resources": [
         {
             "comments": "SNS VM",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('SNSName')]",
-            "apiVersion": "2015-06-15",
+            "apiVersion": "2017-03-30",
             "location": "[resourceGroup().location]",
             "plan": {
                 "name": "byol-single-instance",
@@ -105,12 +102,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "[parameters('SNSName')]",
-                        "createOption": "FromImage",
-                        "vhd": {
-                            "uri": "[concat('http', '://', variables('StorageAccountName'), '.blob.core.windows.net', concat('/vhds/', parameters('SNSName'),'.vhd'))]"
-                        },
-                        "caching": "ReadWrite"
+                        "createOption": "FromImage"
                     },
                     "dataDisks": []
                 },
@@ -142,7 +134,6 @@
             },
             "resources": [],
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccountName'))]",
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfPublicName'))]",
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('SNSIfPrivateName'))]"
             ]
@@ -280,22 +271,6 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Network/routeTables', parameters('RouteTableName'))]"
             ]
-        },
-        {
-            "comments": "Storage account",
-            "type": "Microsoft.Storage/storageAccounts",
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "kind": "Storage",
-            "name": "[variables('StorageAccountName')]",
-            "apiVersion": "2016-01-01",
-            "location": "[resourceGroup().location]",
-            "tags": {},
-            "properties": {},
-            "resources": [],
-            "dependsOn": []
         }
     ]
 }
