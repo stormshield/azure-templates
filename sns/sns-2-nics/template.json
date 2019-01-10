@@ -4,12 +4,12 @@
     "parameters": {
     	"SNSAdminPassword": {
             "defaultValue": null,
-            "type": "SecureString",
+            "type": "securestring",
             "metadata": { "description": "Administration password of the SNS" }
         },
     	"VnetName": {
             "defaultValue": "virtual-network",
-            "type": "String",
+            "type": "string",
             "metadata": { "description": "Name of the virtual network" }
         },
         "VnetPrefix": {
@@ -39,42 +39,42 @@
         },
         "SNSName": {
             "defaultValue": "sns-gateway",
-            "type": "String",
+            "type": "string",
             "metadata": { "description": "Name of the SNS virtual machine" }
         },
         "SNSIfPublicName": {
             "defaultValue": "sns-gateway-public-nic",
-            "type": "String",
+            "type": "string",
             "metadata": { "description": "Name of the SNS VM public interface" }
         },
         "SNSIfPublicIP": {
             "defaultValue": "192.168.0.100",
-            "type": "String",
+            "type": "string",
             "metadata": { "description": "IP address of the SNS VM public interface" }
         },
         "SNSIfPrivateName": {
             "defaultValue": "sns-gateway-private-nic",
-            "type": "String",
+            "type": "string",
             "metadata": { "description": "Name of the SNS VM private interface" }
         },
         "SNSIfPrivateIP": {
             "defaultValue": "192.168.1.100",
-            "type": "String",
+            "type": "string",
             "metadata": { "description": "IP address of the SNS VM private interface" }
         },
         "VmSize": {
             "defaultValue": "Standard_D2s_v3",
-            "type": "String",
+            "type": "string",
             "metadata": { "description": "Azure VM Size" }
         },
         "PublicIpName": {
             "defaultValue": "sns-gateway-public-ip",
-            "type": "String",
+            "type": "string",
             "metadata": { "description": "Name of the Public IP" }
         },
         "RouteTableName": {
             "defaultValue": "route-table-private",
-            "type": "String",
+            "type": "string",
             "metadata": { "description": "Name of the Private subnet route table" }
         }
     },
@@ -155,7 +155,7 @@
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('PublicIpName'))]"
                             },
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName')), '/subnets/public')]"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName')), '/subnets/', parameters('PublicSubnetName'))]"
                             }
                         }
                     }
@@ -185,7 +185,7 @@
                             "privateIPAddress": "[parameters('SNSIfPrivateIP')]",
                             "privateIPAllocationMethod": "Static",
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName')), '/subnets/private')]"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName')), '/subnets/', parameters('PrivateSubnetName'))]"
                             }
                         }
                     }
