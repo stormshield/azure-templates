@@ -33,7 +33,7 @@
             "value": "192.168.0.100"
         },
         "VmSize": {
-            "value": "Standard_A1"
+            "value": "Standard_F1"
         },
         "SGName": {
             "value": "security-group"

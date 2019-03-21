@@ -63,7 +63,7 @@
             "metadata": { "description": "IP address of the SNS VM private interface" }
         },
         "VmSize": {
-            "defaultValue": "Standard_D2s_v3",
+            "defaultValue": "Standard_F1",
             "type": "string",
             "metadata": { "description": "Azure VM Size" }
         },
@@ -87,7 +87,7 @@
             "location": "[resourceGroup().location]",
             "plan": {
                 "name": "byol-single-instance",
-                "product": "stormshield-network-security-for-cloud",
+                "product": "stormshield-elastic-virtual-appliance",
                 "publisher": "stormshield"
             },
             "properties": {
@@ -97,7 +97,7 @@
                 "storageProfile": {
                     "imageReference": {
                         "publisher": "stormshield",
-                        "offer": "stormshield-network-security-for-cloud",
+                        "offer": "stormshield-elastic-virtual-appliance",
                         "sku": "byol-single-instance",
                         "version": "latest"
                     },

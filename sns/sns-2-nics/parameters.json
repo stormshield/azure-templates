@@ -39,7 +39,7 @@
             "value": "192.168.1.100"
         },
         "VmSize": {
-            "value": "Standard_A3"
+            "value": "Standard_F1"
         },
         "PublicIpName": {
             "value": "sns-gateway-public-ip"
