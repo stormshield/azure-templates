@@ -1,0 +1,69 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"SNSAdminPassword": {
+			"value": "ChangeMe!953"
+		},
+		"VnetName": {
+			"value": "virtual-network"
+		},
+		"VnetPrefix": {
+			"value": "192.168.0.0/16"
+		},
+		"PublicSubnetName": {
+			"value": "Public"
+		},
+		"PublicSubnetPrefix": {
+			"value": "192.168.0.0/24"
+		},
+		"PrivateSubnetName": {
+			"value": "Private"
+		},
+		"PrivateSubnetPrefix": {
+			"value": "192.168.1.0/24"
+		},
+		"SNSName": {
+			"value": "sns-gateway"
+		},
+		"SNSIfPublicName": {
+			"value": "sns-gateway-public-nic"
+		},
+		"SNSIfPublicIP": {
+			"value": "192.168.0.100"
+		},
+		"SNSIfPrivate1Name": {
+			"value": "sns-gateway-private-nic-1"
+		},
+		"SNSIfPrivate2Name": {
+			"value": "sns-gateway-private-nic-2"
+		},
+		"SNSIfPrivate3Name": {
+			"value": "sns-gateway-private-nic-2"
+		},
+		"SNSIfPrivateIP1": {
+			"value": "192.168.1.100"
+		},
+		"SNSIfPrivateIP2": {
+			"value": "192.168.2.100"
+		},
+		"SNSIfPrivateIP3": {
+			"value": "192.168.3.100"
+		},
+		"VmSize": {
+			"value": "Standard_F4"
+		},
+		"PublicIpName": {
+			"value": "sns-gateway-public-ip"
+		},
+		"RouteTable1Name": {
+			"value": "route-table-private-1"
+		},
+		"RouteTable2Name": {
+			"value": "route-table-private-2"
+		},
+		"RouteTable3Name": {
+			"value": "route-table-private-3"
+		}
+	}
+}
