@@ -14,6 +14,15 @@ This Azure Resource Manager template deploys a SNS VM and configure a DMZ subnet
 
 <img src="img/topo-simple.png" alt="network topology">
 
+## Note about the password:
+
+The password must not contain the following characters: ``" ' ` \ $``
+
+If the password can not bet set, the following error is raised:
+```
+ARM.ResourceOperationFailure.OSProvisioningInternalError/OSProvisioningError
+ProvisioningResultMessage:[ProvisionError] Failed to provision: [OSUtilError] Failed to set password for admin
+```
 
 ## Next configuration steps:
 
