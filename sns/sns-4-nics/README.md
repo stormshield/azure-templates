@@ -14,7 +14,7 @@ This Azure Resource Manager template deploys a SNS VM with 4 network interfaces.
 
 ## Note about the password:
 
-The password must not contain the following characters: ``" ' ` \ $``
+The password must not contain the following characters: ``" ' ` \ $ ( )``
 
 If the password can not bet set, the following error is raised:
 ```

@@ -16,7 +16,7 @@ This Azure Resource Manager template deploys a SNS VM and configure a DMZ subnet
 
 ## Note about the password:
 
-The password must not contain the following characters: ``" ' ` \ $``
+The password must not contain the following characters: ``" ' ` \ $ ( )``
 
 If the password can not bet set, the following error is raised:
 ```
