@@ -350,6 +350,22 @@
 							"nextHopType": "VirtualAppliance",
 							"nextHopIpAddress": "[parameters('SNSIfPrivate1IP')]"
 						}
+					},
+					{
+						"name": "interSubnetTo2",
+						"properties": {
+							"addressPrefix": "[parameters('PrivateSubnet2Prefix')]",
+							"nextHopType": "VirtualAppliance",
+							"nextHopIpAddress": "[parameters('SNSIfPrivate1IP')]"
+						}
+					},
+					{
+						"name": "interSubnetTo3",
+						"properties": {
+							"addressPrefix": "[parameters('PrivateSubnet3Prefix')]",
+							"nextHopType": "VirtualAppliance",
+							"nextHopIpAddress": "[parameters('SNSIfPrivate1IP')]"
+						}
 					}
 				]
 			},
@@ -371,6 +387,22 @@
 							"nextHopType": "VirtualAppliance",
 							"nextHopIpAddress": "[parameters('SNSIfPrivate2IP')]"
 						}
+					},
+					{
+						"name": "interSubnetTo1",
+						"properties": {
+							"addressPrefix": "[parameters('PrivateSubnet1Prefix')]",
+							"nextHopType": "VirtualAppliance",
+							"nextHopIpAddress": "[parameters('SNSIfPrivate2IP')]"
+						}
+					},
+					{
+						"name": "interSubnetTo3",
+						"properties": {
+							"addressPrefix": "[parameters('PrivateSubnet3Prefix')]",
+							"nextHopType": "VirtualAppliance",
+							"nextHopIpAddress": "[parameters('SNSIfPrivate2IP')]"
+						}
 					}
 				]
 			},
@@ -389,6 +421,22 @@
 						"name": "toInternet",
 						"properties": {
 							"addressPrefix": "0.0.0.0/0",
+							"nextHopType": "VirtualAppliance",
+							"nextHopIpAddress": "[parameters('SNSIfPrivate3IP')]"
+						}
+					},
+					{
+						"name": "interSubnetTo1",
+						"properties": {
+							"addressPrefix": "[parameters('PrivateSubnet1Prefix')]",
+							"nextHopType": "VirtualAppliance",
+							"nextHopIpAddress": "[parameters('SNSIfPrivate3IP')]"
+						}
+					},
+					{
+						"name": "interSubnetTo2",
+						"properties": {
+							"addressPrefix": "[parameters('PrivateSubnet2Prefix')]",
 							"nextHopType": "VirtualAppliance",
 							"nextHopIpAddress": "[parameters('SNSIfPrivate3IP')]"
 						}

@@ -11,6 +11,7 @@ This Azure Resource Manager template deploys a SNS VM with 4 network interfaces.
 
 * The virtual network has a public subnet facing Internet and 3 private subnets for servers
 * 3 route tables are created to route trafic from the private networks through the SNS appliance
+* Inter-subnet traffic inspection is enabled by the UDR for each subnet in the route tables
 
 ## Note about the password:
 
@@ -24,8 +25,8 @@ ProvisioningResultMessage:[ProvisionError] Failed to provision: [OSUtilError] Fa
 
 ## Next configuration steps:
 
-* Setup Filtering and NAT masquerading for the Private subnet on the SNS appliance
-* Deploy servers in the private subnet
+* Setup Filtering and NAT masquerading for the Private subnets on the SNS appliance
+* Deploy servers in the private subnets
 * Configure NAT redirection to publish services
 
 
