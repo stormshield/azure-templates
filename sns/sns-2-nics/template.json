@@ -204,11 +204,13 @@
             "comments": "SNS VM public IP",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[parameters('PublicIpName')]",
-            "apiVersion": "2016-03-30",
+            "apiVersion": "2024-05-01",
             "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
             "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "idleTimeoutInMinutes": 4
+                "publicIPAllocationMethod": "Static"
             },
             "resources": [],
             "dependsOn": []
