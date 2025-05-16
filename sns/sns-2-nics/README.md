@@ -1,7 +1,7 @@
 # Stormshield Network Security VM with 2 network interfaces
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fstormshield%2Fazure-templates%2Fmaster%2Fsns%2Fsns-2-nics%2Ftemplate.json" target="_blank">
-    <img src="http://azuredeploy.net/deploybutton.png"/>
+    <img src="https://aka.ms/deploytoazurebutton"/>
 </a><a href="http://armviz.io/#/?load=https://raw.githubusercontent.com/stormshield/azure-templates/master/sns/sns-2-nics/template.json" target="_blank">
   <img src="http://armviz.io/visualizebutton.png"/>
 </a>
